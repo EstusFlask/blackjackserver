@@ -33,9 +33,7 @@ public class Player {
                 aCount--;
                 value -= 10;
             }
-            if (value > 21) {
-                return -1;
-            }
+
         }
 
         return value;

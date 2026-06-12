@@ -3,7 +3,7 @@ package com.blackjackserver.model;
 import java.util.ArrayList;
 
 public class Hand {
-    private ArrayList<Card> handCards;
+    private ArrayList<Card> handCards = new ArrayList<>();
 
     public ArrayList<Card> getHandCards() {
         return handCards;

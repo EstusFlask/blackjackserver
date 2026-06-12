@@ -8,7 +8,7 @@ public class GameService {
     private Deck deck;
 
     public  GameService() {
-        Deck deck = new Deck();
+        deck = new Deck();
         player1 = new Player(false, deck);
         dealer = new Player(true, deck);
 
@@ -16,21 +16,15 @@ public class GameService {
         System.out.println(player1.showHand());
     }
 
-    public int comparePlayers() {
-        if (player1.count(deck) > dealer.count(deck)) {
-            System.out.println("Dealer:" + dealer.showHand());
-            System.out.println("Player1:" + player1.showHand());
-            System.out.println("Player Won !");
+    private int comparePlayers() {
+        if ((player1.count(deck) > dealer.count(deck)) || dealer.count(deck) > 21) {
+            // player won
             return 1;
         } else if (player1.count(deck) < dealer.count(deck)) {
-            System.out.println("Dealer:" + dealer.showHand());
-            System.out.println("Player1:" + player1.showHand());
-            System.out.println("Player Lost !");
+            // player lost
             return 2;
         } else {
-            System.out.println("Dealer:" + dealer.showHand());
-            System.out.println("Player1:" + player1.showHand());
-            System.out.println("draw");
+            // draw
             return 0;
         }
     }
@@ -40,7 +34,23 @@ public class GameService {
         System.out.println(player1.showHand());
     }
 
-    public void stand() {
-        comparePlayers();
+    public int stand() {
+        return comparePlayers();
+    }
+
+    public String getPlayerHand() {
+        return player1.showHand();
+    }
+
+    public String getDealerHand() {
+        return dealer.showHand();
+    }
+
+    public int getPlayerCount() {
+        return player1.count(deck);
+    }
+
+    public int getDealerCount() {
+        return dealer.count(deck);
     }
 }

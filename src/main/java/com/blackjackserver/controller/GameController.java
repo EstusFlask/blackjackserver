@@ -1,51 +1,92 @@
 package com.blackjackserver.controller;
 
 import com.blackjackserver.service.GameService;
-
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
-
 @RestController
-@RequestMapping("/games")
+@RequestMapping("/game")
 public class GameController {
-    private Map<Long, BlackjackGame> games = new HashMap<>();
-    private AtomicLong idCounter = new AtomicLong();
+    private GameService gameService;
+    private boolean gameOver = true;
 
-    @PostMapping
-    public Long createGame() {
-        long id = idCounter.incrementAndGet();
-        games.put(id, new BlackjackGame());
-        return id; // 返回游戏ID
+    @PostMapping("/start")
+    public GameState startGame() {
+        gameService = new GameService();
+        gameOver = false;
+        return currentState("New game started.", null);
     }
 
-    @PostMapping("/{id}/hit")
-    public String hit(@PathVariable Long id) {
-        BlackjackGame game = games.get(id);
-        if (game == null) return "游戏不存在";
-        game.playerHit();
-        return game.getStatus();
+    @PostMapping("/hit")
+    public ResponseEntity<GameState> hit() {
+        if (gameService == null || gameOver) {
+            return ResponseEntity.badRequest().body(noActiveGameState());
+        }
+
+        gameService.hit();
+        if (gameService.getPlayerCount() > 21) {
+            gameOver = true;
+            return ResponseEntity.ok(currentState("Player busted. Start a new game.", "lost"));
+        }
+
+        return ResponseEntity.ok(currentState("Player hit.", null));
     }
 
-    @PostMapping("/{id}/stand")
-    public String stand(@PathVariable Long id) {
-        BlackjackGame game = games.get(id);
-        if (game == null) return "游戏不存在";
-        game.playerStand();
-        return game.getStatus();
+    @PostMapping("/stand")
+    public ResponseEntity<GameState> stand() {
+        if (gameService == null || gameOver) {
+            return ResponseEntity.badRequest().body(noActiveGameState());
+        }
+
+        int result = gameService.stand();
+        gameOver = true;
+        return ResponseEntity.ok(currentState("Game ended. Start a new game.", resultName(result)));
     }
 
-    @GetMapping("/{id}")
-    public String getStatus(@PathVariable Long id) {
-        BlackjackGame game = games.get(id);
-        if (game == null) return "游戏不存在";
-        return game.getStatus();
+    private GameState currentState(String message, String result) {
+        return new GameState(
+                message,
+                gameOver,
+                result,
+                gameService.getPlayerHand(),
+                gameService.getPlayerCount(),
+                gameService.getDealerHand(),
+                gameService.getDealerCount()
+        );
+    }
+
+    private GameState noActiveGameState() {
+        return new GameState(
+                "No active game. Start a new game first.",
+                true,
+                null,
+                null,
+                0,
+                null,
+                0
+        );
+    }
+
+    private String resultName(int result) {
+        if (result == 1) {
+            return "won";
+        }
+        if (result == 2) {
+            return "lost";
+        }
+        return "draw";
+    }
+
+    public record GameState(
+            String message,
+            boolean gameOver,
+            String result,
+            String playerHand,
+            int playerScore,
+            String dealerHand,
+            int dealerScore
+    ) {
     }
 }
