@@ -1,6 +1,6 @@
 package com.blackjackserver.model;
 
-import java.util.ArrayList;
+
 
 public class Player {
     private Hand hand;
@@ -8,14 +8,15 @@ public class Player {
         hand = new Hand();
         hand.drawCard(deck.getCardFromDeck());
         hand.drawCard(deck.getCardFromDeck());
-        while (Dealer && this.count(deck) < 17) {
+        while (Dealer && this.count() < 17) {
             hand.drawCard(deck.getCardFromDeck());
         }
     }
 
     // 算点数 包括防止因为A爆牌
-    public int count(Deck deck) {
-
+    public int count() {
+        // 目前目标21点
+        int goal = 21;
 
         int aCount = 0;
         int value = 0;
@@ -28,8 +29,8 @@ public class Player {
 
         if (aCount == 0) {
             return value;
-        } else if (value > 21) {
-            while (value > 21 && aCount > 0) {
+        } else if (value > goal) {
+            while (value > goal && aCount > 0) {
                 aCount--;
                 value -= 10;
             }

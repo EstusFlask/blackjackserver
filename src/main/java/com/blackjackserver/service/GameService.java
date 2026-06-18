@@ -17,10 +17,10 @@ public class GameService {
     }
 
     private int comparePlayers() {
-        if ((player1.count(deck) > dealer.count(deck)) || dealer.count(deck) > 21) {
+        if ((player1.count() > dealer.count()) || dealer.count() > 21) {
             // player won
             return 1;
-        } else if (player1.count(deck) < dealer.count(deck)) {
+        } else if (player1.count() < dealer.count()) {
             // player lost
             return 2;
         } else {
@@ -47,10 +47,10 @@ public class GameService {
     }
 
     public int getPlayerCount() {
-        return player1.count(deck);
+        return player1.count();
     }
 
     public int getDealerCount() {
-        return dealer.count(deck);
+        return dealer.count();
     }
 }

@@ -1,10 +1,11 @@
 package com.blackjackserver.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Random;
 
 public class Deck {
     private ArrayList<Card> deck;
+
     public Deck() {
         deck = new ArrayList<>();
         String[] suits = { "Spades", "Hearts", "Clubs", "Diamonds"};
@@ -15,10 +16,23 @@ public class Deck {
                 deck.add(card);
             }
         }
-        Collections.shuffle(deck);
+        shuffle();
     }
     public Card getCardFromDeck() {
-        return deck.remove(0);
+        return deck.remove(deck.size() - 1);
+    }
+
+    private void shuffle() {
+        Random rand = new Random();
+        for (int i = deck.size() - 1; i >= 1; i--) {
+            swap (i, rand.nextInt(i + 1));
+        }
+    }
+
+    private void swap (int i, int j) {
+        Card temp = deck.get(i);
+        deck.set(i, deck.get(j));
+        deck.set(j, temp);
     }
 
 }
